@@ -10,6 +10,8 @@
 #include "MotionControllerComponent.h"
 #include "Gun.h"
 #include "Engine/World.h"
+#include "Components/SkeletalMeshComponent.h"
+
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -57,10 +59,20 @@ void AS05_TestingGroundsCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	if (!ensure(GunBlueprint))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GunBlueprint missing"));
+	}
 	Gun = GetWorld()->SpawnActor<AGun>(GunBlueprint);
 
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	Gun->AnimInstance = Mesh1P->GetAnimInstance();
+	
+	if (EnableTouchscreenMovement(InputComponent) == false)
+	{
+		InputComponent->BindAction("Fire", IE_Pressed, Gun, &AGun::OnFire);
+	}
 
 	// Show or hide the two versions of the gun based on whether or not we're using motion controllers.
 	/*if (bUsingMotionControllers)
@@ -87,10 +99,10 @@ void AS05_TestingGroundsCharacter::SetupPlayerInputComponent(class UInputCompone
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AS05_TestingGroundsCharacter::TouchStarted);
-	if (EnableTouchscreenMovement(PlayerInputComponent) == false)
+	/*if (EnableTouchscreenMovement(PlayerInputComponent) == false)
 	{
-		//PlayerInputComponent->BindAction("Fire", IE_Pressed, Gun, &AGun::OnFire);
-	}
+		PlayerInputComponent->BindAction("Fire", IE_Pressed, Gun, &AGun::OnFire);
+	}*/
 
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AS05_TestingGroundsCharacter::OnResetVR);
 
