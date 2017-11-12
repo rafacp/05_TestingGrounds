@@ -8,6 +8,8 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
+#include "Gun.h"
+#include "Engine/World.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -48,7 +50,6 @@ AS05_TestingGroundsCharacter::AS05_TestingGroundsCharacter()
 	L_MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("L_MotionController"));
 	L_MotionController->SetupAttachment(RootComponent);
 
-	
 }
 
 void AS05_TestingGroundsCharacter::BeginPlay()
@@ -56,8 +57,10 @@ void AS05_TestingGroundsCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	Gun = GetWorld()->SpawnActor<AGun>(GunBlueprint);
+
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-	//FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
 	// Show or hide the two versions of the gun based on whether or not we're using motion controllers.
 	/*if (bUsingMotionControllers)
@@ -86,7 +89,7 @@ void AS05_TestingGroundsCharacter::SetupPlayerInputComponent(class UInputCompone
 	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AS05_TestingGroundsCharacter::TouchStarted);
 	if (EnableTouchscreenMovement(PlayerInputComponent) == false)
 	{
-		//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AS05_TestingGroundsCharacter::OnFire);
+		//PlayerInputComponent->BindAction("Fire", IE_Pressed, Gun, &AGun::OnFire);
 	}
 
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AS05_TestingGroundsCharacter::OnResetVR);
