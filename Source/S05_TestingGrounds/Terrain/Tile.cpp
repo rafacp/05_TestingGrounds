@@ -32,7 +32,7 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int32 MinSpawn, int32 MaxSp
 	FVector Max(4000, 2000, 0);
 	FBox Bounds(Min, Max);
 	int32 NumberToSpawn = FMath::RandRange(MinSpawn, MaxSpawn);
-	for (size_t i = 0; i < NumberToSpawn; i++)
+	for (size_t i = 0; i < NumberToSpawn; )
 	{
 		FVector SpawnPoint = FMath::RandPointInBox(Bounds);
 		if (!CastSphere(SpawnPoint + GetActorLocation(), 300))
@@ -40,6 +40,7 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int32 MinSpawn, int32 MaxSp
 			AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
 			Spawned->SetActorRelativeLocation(SpawnPoint);
 			Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+			i++;
 		}
 	}
 }
@@ -47,9 +48,9 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int32 MinSpawn, int32 MaxSp
 bool ATile::CastSphere(FVector Location, float Radius)
 {
 	FHitResult HitResult;
-	bool HasHit = GetWorld()->SweepSingleByChannel(HitResult, Location, Location, FQuat::Identity, ECollisionChannel::ECC_Camera, FCollisionShape::MakeSphere(Radius));
+	bool HasHit = GetWorld()->SweepSingleByChannel(HitResult, Location, Location, FQuat::Identity, ECollisionChannel::ECC_GameTraceChannel2, FCollisionShape::MakeSphere(Radius));
 	FColor ResultColor = HasHit ? FColor::Red : FColor::Green;
-	DrawDebugSphere(GetWorld(), Location, Radius, 64, ResultColor, true, 100);
+	//DrawDebugSphere(GetWorld(), Location, Radius, 64, ResultColor, true, 100);
 	return HasHit;
 }
 
