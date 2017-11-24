@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
 #include "ActorPool.h"
+#include "AI/Navigation/NavigationSystem.h"
 
 // Sets default values
 ATile::ATile()
@@ -13,6 +14,7 @@ ATile::ATile()
 	PrimaryActorTick.bCanEverTick = true;
 	MinExtent = FVector(0, -2000, 0);
 	MaxExtent = FVector(4000, 2000, 0);
+	NavigationBoundsOffset = FVector(2000, 0, 0);
 }
 
 // Called when the game starts or when spawned
@@ -65,8 +67,8 @@ void ATile::PositionNavMeshBounds()
 		return;
 	}
 
-	NavMeshBoundsVolume->SetActorLocation(GetActorLocation());
-	//NavMeshBoundsVolume->
+	NavMeshBoundsVolume->SetActorLocation(GetActorLocation() + NavigationBoundsOffset);
+	GetWorld()->GetNavigationSystem()->Build();
 }
 
 bool ATile::FindEmptyLocation(FVector& OutLocation, float Radius)
