@@ -54,18 +54,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Pool")
 	void SetPool(UActorPool* Pool);
 
-
-
 private:
-	void RandomSpawnPositions(const int32 &MinSpawn, const int32 &MaxSpawn, float MinScale, float MaxScale, float Radius, TArray<FSpawnPosition> &SpawnPositions);
-
 	void PositionNavMeshBounds();
-
+	
+	template<class T>
+	void RandomlyPlaceActors(TSubclassOf<T> ToSpawn, int32 MinSpawn = 0, int32 MaxSpawn = 1, float Radius = 500, float MinScale = 1.f, float MaxScale = 1.f);
+	
 	bool FindEmptyLocation(FVector& OutLocation, float Radius);
 
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, const FSpawnPosition& SpawnPosition);
 	
-	void PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition &SpawnPosition);
+	void PlaceActor(TSubclassOf<APawn> ToSpawn, FSpawnPosition &SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
@@ -73,3 +72,4 @@ private:
 
 	AActor* NavMeshBoundsVolume;
 };
+
