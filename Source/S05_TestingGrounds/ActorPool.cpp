@@ -29,6 +29,7 @@ void UActorPool::Return(AActor * ActorToReturn)
 {
 	if (!ensure(ActorToReturn))
 	{
+		UE_LOG(LogTemp, Error, TEXT("Trying to Return a NULL Actor"));
 		return;
 	}
 	Add(ActorToReturn);
@@ -38,6 +39,8 @@ void UActorPool::Add(AActor * ActorToAdd)
 {
 	if (!ensure(ActorToAdd))
 	{
+		UE_LOG(LogTemp, Error, TEXT("Trying to add a NULL Actor"));
+
 		return;
 	}
 	Pool.Push(ActorToAdd);

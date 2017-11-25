@@ -26,6 +26,12 @@ void ATile::BeginPlay()
 
 void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	if (!ensure(Pool) || !ensure(NavMeshBoundsVolume))
+	{
+		UE_LOG(LogTemp, Error, TEXT("End Play called with null Pool or NavMeshBoundsVolume"));
+
+		return;
+	}
 	Pool->Return(NavMeshBoundsVolume);
 }
 
@@ -103,7 +109,13 @@ bool ATile::FindEmptyLocation(FVector& OutLocation, float Radius)
 
 void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, const FSpawnPosition& SpawnPosition)
 {
-	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
+	FRotator Rotation = FRotator(0, SpawnPosition.Rotation, 0);
+	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn, SpawnPosition.Location, Rotation);
+	if (!ensure(Spawned))
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Spawned Actor - Stopping"));
+		return;
+	}
 	Spawned->SetActorRelativeLocation(SpawnPosition.Location);
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
@@ -113,6 +125,11 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, const FSpawnPosition& SpawnP
 void ATile::PlaceActor(TSubclassOf<APawn> ToSpawn, FSpawnPosition &SpawnPosition)
 {
 	APawn* Spawned = GetWorld()->SpawnActor<APawn>(ToSpawn);
+	if (!ensure(Spawned))
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Spawned Pawn - Stopping"));
+		return;
+	}
 	Spawned->SetActorRelativeLocation(SpawnPosition.Location);
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
